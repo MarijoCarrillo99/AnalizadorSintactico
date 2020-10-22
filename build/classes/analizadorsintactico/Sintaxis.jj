@@ -1,0 +1,221 @@
+options {
+  IGNORE_CASE = true; //para no hacer distincion entre mayusculas y minusculas.
+  STATIC = false; //para que los metodos que genere la compilacion no sean estaticos.
+}
+PARSER_BEGIN(Sintaxis)
+
+ 
+class Sintaxis {
+	public static void main(String[] args) throws ParseException
+    {
+			try{
+				Sintaxis analizador = new Sintaxis(System.in);
+				analizador.Principal();
+				System.out.println("Se ha compilado con exito");
+			}
+			catch(ParseException e){
+				System.out.println(e.getMessage());
+				System.out.println("Se han encontrado errores");
+			}
+    }
+}
+
+
+PARSER_END(Sintaxis)
+
+//Definicion de tokens 
+//PALABRAS RESERVADAS
+TOKEN: 
+{ 
+ <PR_PCK : "package"> 
+ | <PR_SYS : "System">
+ | <PR_OUT : "out">
+ | <PR_PRT : "print">
+ | <PR_PRTL : "println">
+ | <PR_IMP : "import">
+ | <PR_CLS : "class">
+ | <PR_PUB : "public">
+ | <PR_STC : "static">
+ | <PR_VOID : "void">
+ | <PR_MAIN : "main">
+ | <PR_RTN : "return">
+ | <PR_NULL : "null">
+ | <PR_NEW : "new">
+ | <PR_EXT : "extense">
+ | <PR_THR : "throw">
+ | <PR_BREAKE : "breake">
+ | <PR_CON : "continue">
+ | <PR_SUPER : "super">
+ | <PR_THIS : "this">
+ | <PR_ABS : "abstract">
+ | <PR_INT : "interface">
+ | <PR_SYN : "synchronized">
+ | <PR_DFT : "default">
+}
+
+//CICLOS
+TOKEN: 
+{
+<CICL_DO : "do">
+| <CICL_WHI : "while">
+| <CICL_FOR : "for">
+}
+
+
+//CONDICIONES
+TOKEN: 
+{
+<CONDI_ELSE : "else">
+| <CONDI_IF : "if">
+| <CONDI_SWT : "switch">
+| <CONDI_IFELS : "ifelse">
+| <CONDI_CASE : "case">
+}
+
+
+
+//TIPOS DE ACCESO 
+TOKEN: 
+{
+<TIPACESS_PRO : "protected">
+}
+
+
+//TIPOS DE DATOS 
+TOKEN: 
+{
+<TIPDAT_INT : "int">
+| <TIPDAT_DOU : "double">
+| <TIPDAT_FLO : "float">
+| <TIPDAT_CHAR : "char">
+| <TIPDAT_LONG : "long">
+| <TIPDAT_BYTE : "byte">
+| <TIPDAT_BOOLE : "boolean">
+| <TIPDAT_STR : "String">
+| <TIPDAT_SHR : "short">
+}
+
+
+//BOOLEANOS
+TOKEN: 
+{
+<BOOLE_TRUE : "true">
+| <BOOLE_FALSE : "false">
+}
+
+//ERRORES
+TOKEN: 
+{
+<ERROR_TRY : "try">
+| <ERROR_CATCH : "catch">
+}
+
+//OPERADORES LOGICOS  
+TOKEN: 
+{
+<OPE_MAYOR : ">">
+| <OPE_MENOR : "<">
+| <OPE_MAYORIGUAL : ">=">
+| <OPE_MENORIGUAL : "<=">
+| <OPE_DIFERENTE : "!=">
+| <OPE_DOBLEIGUAL : "==">
+| <OPE_AND : "&&">
+}
+
+
+//OPERADORES ARITMETICOS 
+TOKEN: 
+{
+<OPEARI_SUMA : "+">
+| <OPEARI_RESTA : "-">
+| <OPEARI_DIV : "/">
+| <OPEARI_MODULAR : "%">
+| <OPEARI_MULTI : "*">
+| <OPEARI_INCREMENTO : "++">
+| <OPEARI_DECREMENTO : "--">
+| <OPEARI_POTENCIA : "^">
+}
+
+
+//OTROS
+TOKEN: 
+{
+<OTROS_ASIG : "=">
+| <OTROS_LLAVEINI : "{">
+| <OTROS_LLAVEFIN : "}">
+| <OTROS_CORCHABRIR : "[">
+| <OTROS_CORCHCIERRE : "]">
+| <OTROS_PARENABRIR : "(">
+| <OTROS_PARENCIERRE : ")">
+| <OTROS_COMSIMPLE : "\'">
+| <OTROS_COMDOB : "\"">
+| <OTROS_PUNCOMA : ";">
+| <OTROS_DOSPUN : ":">
+}
+
+
+//EXPRESIONES REGULARES
+TOKEN: 
+{
+<NUMERO : (["0"-"9"])+>  
+	| <IDENTIFICADOR : ["a"-"z","A"-"Z"](["a"-"z","A"-"Z","0"-"9","_"])*>  
+	| <NUMBER : (["0"-"9"])+["."](["0"-"9"])+ > 
+	| <CHARAC : "'"["a"-"z","A"-"Z","0"-"9"]"'" >
+}
+
+//IGNORA ESPACIOS, SALTOS DE LINEA, TABULADORES
+SKIP : 
+{ 
+	" "|"\n" | "\r" | "\r\n" | "\t"
+}
+
+//VOID PARA QUE NO RETORNE 
+void Principal():
+{}
+{
+  <PR_PUB><PR_CLS><IDENTIFICADOR><OTROS_LLAVEINI>Body()<OTROS_LLAVEFIN><OTROS_DOSPUN><EOF> //EOF INDICA EL FINAL DE TODO
+}
+
+void Body():
+{}
+{
+  LOOKAHEAD(2)Estructura() | VariablesGlobales() //LOOKAHEAD ES PARA QUE ELIJA UNA OPCION U OTRA
+}
+         
+void Estructura():
+{}
+{
+  <PR_PUB><PR_STC><PR_VOID><PR_MAIN><OTROS_LLAVEINI>Sentencias()<OTROS_LLAVEFIN>
+}
+
+void VariablesGlobales():
+{}
+{
+  <PR_PUB>(<TIPDAT_STR>|<TIPDAT_CHAR>|<TIPDAT_INT>|<TIPDAT_DOU>|<TIPDAT_FLO>|<TIPDAT_LONG>|<TIPDAT_BYTE>|<TIPDAT_BOOLE>)<IDENTIFICADOR><OTROS_DOSPUN>Body()
+}
+
+void EstructuraMetodo():
+{}
+{
+ <PR_PUB><IDENTIFICADOR><OTROS_PARENABRIR><OTROS_PARENCIERRE><OTROS_LLAVEINI>LocalVariables()<OTROS_LLAVEFIN>
+}
+
+void LocalVariables():
+{}
+{
+ (<TIPDAT_STR>|<TIPDAT_CHAR>|<TIPDAT_INT>|<TIPDAT_DOU>|<TIPDAT_FLO>|<TIPDAT_LONG><TIPDAT_BYTE>|<TIPDAT_BOOLE>)<IDENTIFICADOR><OTROS_DOSPUN>
+}
+
+void Sentencias():
+{}
+{
+  <PR_PUB>  
+}
+
+
+
+
+
+
+
+

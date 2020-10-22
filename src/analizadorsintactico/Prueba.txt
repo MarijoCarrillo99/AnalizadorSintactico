@@ -1,0 +1,13 @@
+public class Pruebiux { 
+
+public String id: 
+
+public static void main {
+ public
+}
+
+
+}:
+
+
+
